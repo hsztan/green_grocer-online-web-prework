@@ -58,9 +58,12 @@ def checkout(cart, coupons)
   cart = consolidate_cart(cart)
   cart = apply_coupons(cart, coupons)
   cart = apply_clearance(cart)
-binding.pry
   cart.each do |k, v|
-    total += v[:price] * v[:count] unless v[:count] == 0
+    if k.include? "W/COUPON"
+      total += v[:price]
+    else
+      total += v[:price] * v[:count] unless v[:count] == 0
+    end
   end
   if total > 100
     total *= 0.9
