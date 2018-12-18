@@ -1,11 +1,13 @@
 require "pry"
 
 cart = [
-  {"BEETS" => {:price => 2.50, :clearance => false}},
-  {"BEETS" => {:price => 2.50, :clearance => false}}
+  {"BEER" => {:price => 13.00, :clearance => false}},
+  {"BEER" => {:price => 13.00, :clearance => false}},
+  {"BEER" => {:price => 13.00, :clearance => false}}
 ]
 
-coupons = []
+coupons = [{:item => "BEER", :num => 2, :cost => 20.00},
+            {:item => "BEER", :num => 2, :cost => 20.00}]
 
 def consolidate_cart(cart)
   cart_hash = {}
@@ -25,7 +27,7 @@ def apply_coupons(cart, coupons)
   i = 0
   while i < coupons.length
     cart.each do |k, v|
-      if k == coupons[i][:item]
+      if k == coupons[i][:item] && v[:count] >= coupons[i][:num]
         new_count = cart[k][:count] - coupons[i][:num]
         coupon_name = k + " W/COUPON"
         coupon_hash = {price: coupons[i][:cost], clearance: cart[k][:clearance], count: 1}
@@ -56,9 +58,10 @@ def checkout(cart, coupons)
   cart = consolidate_cart(cart)
   cart = apply_coupons(cart, coupons)
   cart = apply_clearance(cart)
-  
-  cart.each {|k, v| total += v[:price] * v[:count] unless v[:count] == 0}
-  binding.pry
+
+  cart.each do |k, v|
+    total += v[:price] * v[:count] unless v[:count] == 0
+  end
   if total > 100
     total *= 0.9
     return total.round(2)
